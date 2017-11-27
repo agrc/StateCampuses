@@ -1,0 +1,21 @@
+<div>
+    <div class="title">
+        <h1 class="title__name">
+            <span>Infrastructure</span>
+            <a class="title__version" data-dojo-attach-point="versionNode" href="ChangeLog.html"></a>
+        </h1>
+    </div>
+    <div class="sidebar" data-dojo-attach-point="sidebarNode">
+        <select class="form-control" data-dojo-attach-point="facilityNode" data-dojo-attach-event="change: updateFacility">
+            <option disabled selected>Select a facility</option>
+        </select>
+        <div data-dojo-attach-point="identifyNode"></div>
+        <div class="sidebar--padding"> <!-- required for side bar toggle widget -->
+            <p>Data and services provided by <a href="http://gis.utah.gov">Utah AGRC</a></p>
+            <p>Click a location on the map for more information</p>
+        </div>
+    </div>
+    <div class="centerbar centerbar--border-grey" data-dojo-attach-point="centerbarNode">
+        <div class="map--full-screen" data-dojo-attach-point="mapNode"></div>
+    </div>
+</div>
