@@ -213,6 +213,7 @@ define([
             );
 
             mapController.toggleLayer(config.layer, true);
+            this.identifyTask = new IdentifyTask(config.layer.url);
         },
         updateFacility(evt) {
             // summary:
@@ -277,8 +278,6 @@ define([
             mapController.activeLayer[0].setDynamicLayerInfos(this.currentLayers, false);
 
             mapController.map.setExtent(new Extent(groupInfo.extent), true);
-
-            this.identifyTask = new IdentifyTask(config.layer.url);
         }
     });
 });
