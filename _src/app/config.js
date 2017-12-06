@@ -5,13 +5,13 @@ define([
 
     'esri/config',
     'esri/symbols/SimpleFillSymbol'
-], function (
+], (
     has,
     xhr,
 
     esriConfig,
     SimpleFillSymbol
-) {
+) => {
     let gisServerBaseUrl;
     let quadWord;
     let apiKey;
