@@ -1,6 +1,7 @@
 define([
     './config',
     './MapController',
+    './GeometryEquality',
 
     'dijit/_TemplatedMixin',
     'dijit/_WidgetBase',
@@ -33,6 +34,7 @@ define([
 ], (
     config,
     mapController,
+    comparison,
 
     _TemplatedMixin,
     _WidgetBase,
@@ -223,7 +225,8 @@ define([
             const options = [];
             const totalKeys = layerNameKeys.length;
 
-            layerNameKeys.forEach((name, index) => {
+            groupInfo.layers.sort(comparison).forEach((item, index) => {
+                const [name, type] = item;
                 const dynamicLayerInfo = new DynamicLayerInfo();
                 dynamicLayerInfo.id = index;
                 dynamicLayerInfo.name = name;
@@ -242,9 +245,9 @@ define([
 
                 let symbol = new SimpleMarkerSymbol(config.symbols.point);
 
-                if (groupInfo.layers[name] === 'Polyline') {
+                if (type === 'Polyline') {
                     symbol = new SimpleLineSymbol(config.symbols.line);
-                } else if (groupInfo.layers[name] === 'Polygon') {
+                } else if (type === 'Polygon') {
                     symbol = new SimpleFillSymbol(config.symbols.poly);
                 }
 
