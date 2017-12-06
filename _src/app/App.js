@@ -2,6 +2,7 @@ define([
     './config',
     './MapController',
     './GeometryEquality',
+    './LayerList',
 
     'dijit/_TemplatedMixin',
     'dijit/_WidgetBase',
@@ -35,6 +36,7 @@ define([
     config,
     mapController,
     comparison,
+    LayerList,
 
     _TemplatedMixin,
     _WidgetBase,
@@ -259,6 +261,17 @@ define([
                 options[index] = drawingOptions;
                 this.currentLayers.push(dynamicLayerInfo);
             });
+
+            if (this.layerList) {
+                this.layerList.destroy();
+                this.layerList = null;
+            }
+
+            this.layerList = new LayerList({
+                mapController: mapController,
+                dynamicLayers: this.currentLayers,
+                renderers: options
+            }).placeAt(this.toolbarNode);
 
             mapController.activeLayer[0].setLayerDrawingOptions(options);
             mapController.activeLayer[0].setDynamicLayerInfos(this.currentLayers, false);
