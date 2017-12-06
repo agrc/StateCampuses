@@ -83,8 +83,8 @@ def create_facility_map(input_gdb, output_file):
         extent = json.loads(description.extent.JSON)
 
         mapping.setdefault(facility, {})
-        mapping[facility].setdefault('layers', {})
-        mapping[facility]['layers'][name] = description.shapeType
+        mapping[facility].setdefault('layers', [])
+        mapping[facility]['layers'].append([name, description.shapeType])
         mapping[facility].setdefault('extent', extent)
 
         if mapping[facility]['extent']['ymax'] < extent['ymax']:
