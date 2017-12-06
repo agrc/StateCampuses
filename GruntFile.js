@@ -192,7 +192,7 @@ module.exports = function configure(grunt) {
         jasmine: {
             main: {
                 options: {
-                    specs: ['src/app/**/Spec*.js'],
+                    specs: ['_src/app/**/spec*.js'],
                     vendor: [
                         'src/app/tests/jasmineTestBootstrap.js',
                         'src/dojo/dojo.js',
