@@ -229,10 +229,11 @@ define([
             const totalKeys = layerNameKeys.length;
 
             groupInfo.layers.sort(comparison).forEach((item, index) => {
-                const [name, type] = item;
+                const [joinedName, type] = item;
+                const [name, displayName] = joinedName.split(':');
                 const dynamicLayerInfo = new DynamicLayerInfo();
                 dynamicLayerInfo.id = index;
-                dynamicLayerInfo.name = name;
+                dynamicLayerInfo.name = displayName || name;
 
                 const dataSource = new TableDataSource();
                 dataSource.workspaceId = 'LayerBench';

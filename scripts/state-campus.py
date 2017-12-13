@@ -4,18 +4,19 @@
 state-campus
 
 Usage:
-  state-campus merge-from (<input>) to (<output>)
-  state-campus list-folders (<input>)
-  state-campus create-map (<input>) to (<output>)
+  state-campus merge-from <input> to <output>
+  state-campus list-folders <input>
+  state-campus create-map <input> to <output>
   state-campus -h | --help
 '''
 import json
 import sys
 from os.path import basename, dirname, exists, isdir, join
 
-import arcpy
 import glob2
 from docopt import docopt
+
+import arcpy
 
 
 def merge_geodatabases(input_folder, output_folder):
@@ -51,13 +52,15 @@ def merge_geodatabases(input_folder, output_folder):
         for dataset in datasets:
             feature_classes.extend(arcpy.ListFeatureClasses(feature_dataset=dataset))
 
-        print('')
-        print('reprojecting {}'.format(len(feature_classes)))
+        print('\nreprojecting {}'.format(len(feature_classes)))
 
         for data in feature_classes:
             new_data = join(output_folder, '{}_{}'.format(prefix, data))
 
+            description = arcpy.Describe(data)
+
             arcpy.management.Project(data, new_data, web_mercator)
+            arcpy.AlterAliasName(new_data, description.aliasName)
 
             sys.stdout.write('.')
             sys.stdout.flush()
@@ -84,7 +87,7 @@ def create_facility_map(input_gdb, output_file):
 
         mapping.setdefault(facility, {})
         mapping[facility].setdefault('layers', [])
-        mapping[facility]['layers'].append([name, description.shapeType])
+        mapping[facility]['layers'].append(['{}:{}'.format(name, description.aliasName), description.shapeType])
         mapping[facility].setdefault('extent', extent)
 
         if mapping[facility]['extent']['ymax'] < extent['ymax']:
