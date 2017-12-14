@@ -135,6 +135,7 @@ define([
                     const templateData = identifyResults.map((result) => {
                         return {
                             name: this.currentLayers.filter((layer) => layer.id === result.layerId)[0].name,
+                            color: this.currentLayerDrawingOptions[result.layerId].renderer.symbol.color.toHex(),
                             geometry: result.feature.geometry,
                             attributes: Object.keys(result.feature.attributes).filter((key) => {
                                 if (result.feature.attributes[key].toLowerCase() === 'null' ||
@@ -154,7 +155,9 @@ define([
 
                     let templateBuilder = '';
                     templateData.forEach((item) => {
-                        templateBuilder += `<h5>${item.name}</h5><label>Attributes</label>`;
+                        templateBuilder += `<h5>${item.name}</h5>` +
+                                           `<hr class='identify__hr' style="border-color:${item.color};"` +
+                                           '<label>Attributes</label>';
                         item.attributes.forEach((attribute) => {
                             templateBuilder += `<div>${attribute.label}: ${attribute.value}</div>`;
                         });
@@ -225,7 +228,7 @@ define([
             const groupInfo = config.layerMapping[facility];
             const layerNameKeys = Object.keys(groupInfo.layers);
             this.currentLayers = [];
-            const options = [];
+            this.currentLayerDrawingOptions = [];
             const totalKeys = layerNameKeys.length;
 
             groupInfo.layers.sort(comparison).forEach((item, index) => {
@@ -260,7 +263,7 @@ define([
                 const drawingOptions = new LayerDrawingOptions();
                 drawingOptions.renderer = new SimpleRenderer(symbol);
 
-                options[index] = drawingOptions;
+                this.currentLayerDrawingOptions[index] = drawingOptions;
                 this.currentLayers.push(dynamicLayerInfo);
             });
 
@@ -272,10 +275,10 @@ define([
             this.layerList = new LayerList({
                 mapController: mapController,
                 dynamicLayers: this.currentLayers,
-                renderers: options
+                renderers: this.currentLayerDrawingOptions
             }).placeAt(this.toolbarNode);
 
-            mapController.activeLayer[0].setLayerDrawingOptions(options);
+            mapController.activeLayer[0].setLayerDrawingOptions(this.currentLayerDrawingOptions);
             mapController.activeLayer[0].setDynamicLayerInfos(this.currentLayers, false);
 
             mapController.map.setExtent(new Extent(groupInfo.extent), true);
