@@ -134,7 +134,7 @@ define([
                 this.identifyTask.execute(this.identifyOptions).then((identifyResults) => {
                     const templateData = identifyResults.map((result) => {
                         return {
-                            name: result.layerName,
+                            name: this.currentLayers.filter((layer) => layer.id === result.layerId)[0].name,
                             geometry: result.feature.geometry,
                             attributes: Object.keys(result.feature.attributes).filter((key) => {
                                 if (result.feature.attributes[key].toLowerCase() === 'null' ||
