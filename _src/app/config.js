@@ -67,8 +67,8 @@ define([
         },
         symbols: {
             point: {
+                size: 8,
                 color: [197, 252, 113, 200], // eslint-disable-line no-magic-numbers
-                size: 11,
                 angle: 0,
                 xoffset: 0,
                 yoffset: 0,
