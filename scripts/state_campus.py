@@ -160,7 +160,10 @@ def replace_codes_with_values(feature_class, field_info, domain_info):
 
             cursor.updateRow(row)
 
-    arcpy.management.DeleteField(feature_class, field_names)
+    try:
+        arcpy.management.DeleteField(feature_class, field_names)
+    except:
+        print('could not delete {} from {}'.format(', '.join(field_names), feature_class))
 
 
 def format_time(seconds):
