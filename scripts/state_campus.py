@@ -4,14 +4,15 @@
 state-campus
 
 Usage:
-  state-campus merge-from <input> to <output>
-  state-campus list-folders <input>
-  state-campus create-map <input> to <output>
-  state-campus -h | --help
+  state_campus merge-from <input> to <output>
+  state_campus list-folders <input>
+  state_campus create-map <input> to <output>
+  state_campus -h | --help
 '''
 import json
 import sys
 from os.path import basename, dirname, exists, isdir, join
+from time import clock
 
 import glob2
 from docopt import docopt
@@ -43,6 +44,7 @@ def merge_geodatabases(input_folder, output_folder):
 
     for gdb_path in gdb_paths:
         arcpy.env.workspace = gdb_path
+        domains = arcpy.da.ListDomains()
 
         prefix = basename(dirname(gdb_path)).replace(' ', '')
 
@@ -52,8 +54,8 @@ def merge_geodatabases(input_folder, output_folder):
         for dataset in datasets:
             feature_classes.extend(arcpy.ListFeatureClasses(feature_dataset=dataset))
 
-        print('\nreprojecting {}'.format(len(feature_classes)))
-
+        print('\nETL\'ing {} feature classes'.format(len(feature_classes)))
+        start_etl = clock()
         for data in feature_classes:
             new_data = join(output_folder, '{}_{}'.format(prefix, data))
 
@@ -62,10 +64,15 @@ def merge_geodatabases(input_folder, output_folder):
             arcpy.management.Project(data, new_data, web_mercator)
             arcpy.AlterAliasName(new_data, description.aliasName)
 
+            fields = arcpy.ListFields(data)
+
+            replace_codes_with_values(new_data, fields, domains)
+
             sys.stdout.write('.')
             sys.stdout.flush()
 
         arcpy.ClearEnvironment('workspace')
+        print('\n{}'.format(format_time(clock() - start_etl)))
 
 
 def create_facility_map(input_gdb, output_file):
@@ -119,9 +126,63 @@ def create_empty_feature_class(workspace, sr):
     arcpy.management.CreateFeatureclass(workspace, 'empty', 'POINT', spatial_reference=sr)
 
 
+def replace_codes_with_values(feature_class, field_info, domain_info):
+    field_domain_map = [(field, field.domain) for field in field_info if field.domain]
+    fields = [field[0] for field in field_domain_map]
+    field_names = [field.name for field in fields]
+    domain_names = [domain[1] for domain in field_domain_map]
+
+    if len(domain_names) == 0:
+        return
+
+    domain_lookup = {}
+    for name in domain_names:
+        domain_lookup[name] = [domain for domain in domain_info if domain.name == name][0]
+
+    [arcpy.management.AddField(feature_class, '{}_Value'.format(field.name), 'TEXT', field_alias=field.aliasName) for field in fields]
+
+    def swap_code_for_value(code, domain_name):
+        domain = domain_lookup[domain_name].codedValues
+        if not domain:
+            return code
+
+        if code not in domain:
+            return code
+
+        return domain[code]
+
+    combined_fields = field_names + ['{}_Value'.format(field) for field in field_names]
+
+    with arcpy.da.UpdateCursor(feature_class, combined_fields) as cursor:
+        for row in cursor:
+            values_row = [swap_code_for_value(code, domain_names[i]) for i, code in enumerate(row) if i < len(field_names)]
+            row = row[:len(field_names)] + values_row
+
+            cursor.updateRow(row)
+
+    arcpy.management.DeleteField(feature_class, field_names)
+
+
+def format_time(seconds):
+    minute = 60.00
+    hour = 60.00 * minute
+
+    if seconds < 30:
+        return '{} ms'.format(int(seconds * 1000))
+
+    if seconds < 90:
+        return '{} seconds'.format(round(seconds, 2))
+
+    if seconds < 90 * minute:
+        return '{} minutes'.format(round(seconds / minute, 2))
+
+    return '{} hours'.format(round(seconds / hour, 2))
+
+
 if __name__ == '__main__':
     args = docopt(__doc__)
 
+    start_seconds = clock()
     if args['merge-from']:
         merge_geodatabases(args['<input>'], args['<output>'])
 
@@ -132,3 +193,5 @@ if __name__ == '__main__':
         folders = get_fgdbs_in_folder(args['<input>'])
 
         print([basename(folder) for folder in folders])
+
+    print('\n{}'.format(format_time(clock() - start_seconds)))
