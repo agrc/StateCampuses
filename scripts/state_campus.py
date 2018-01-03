@@ -6,8 +6,11 @@ state-campus
 Usage:
   state_campus merge-from <input> to <output>
   state_campus list-folders <input>
-  state_campus create-map <input> to <output>
+  state_campus create-map <input> to <output> [--recalculate|-r]
   state_campus -h | --help
+
+Options:
+  --recalculate, -r  recalculates the feature class extent
 '''
 import json
 import sys
@@ -75,12 +78,16 @@ def merge_geodatabases(input_folder, output_folder):
         print('\n{}'.format(format_time(clock() - start_etl)))
 
 
-def create_facility_map(input_gdb, output_file):
+def create_facility_map(input_gdb, output_file, recalculate=False):
     if not isdir(input_gdb) or not exists(input_gdb):
         raise Exception('{} is not a valid file geodatabase. exiting'.format(input_gdb))
 
     arcpy.env.workspace = input_gdb
     layers = arcpy.ListFeatureClasses()
+
+    if recalculate:
+        print('recalculating extents.')
+        [arcpy.management.RecalculateFeatureClassExtent(layer) for layer in layers]
 
     layer_descriptions = (arcpy.Describe(layer) for layer in layers)
 
@@ -97,17 +104,20 @@ def create_facility_map(input_gdb, output_file):
         mapping[facility]['layers'].append(['{}:{}'.format(name, description.aliasName), description.shapeType])
         mapping[facility].setdefault('extent', extent)
 
-        if mapping[facility]['extent']['ymax'] < extent['ymax']:
-            mapping[facility]['extent']['ymax'] = extent['ymax']
+        if extent['ymax'] != 'NaN':
+            if mapping[facility]['extent']['ymax'] < extent['ymax']:
+                mapping[facility]['extent']['ymax'] = extent['ymax']
 
-        if mapping[facility]['extent']['ymin'] > extent['ymin']:
-            mapping[facility]['extent']['ymin'] = extent['ymin']
+            if mapping[facility]['extent']['ymin'] > extent['ymin']:
+                mapping[facility]['extent']['ymin'] = extent['ymin']
 
-        if mapping[facility]['extent']['xmax'] < extent['xmax']:
-            mapping[facility]['extent']['xmax'] = extent['xmax']
+            if mapping[facility]['extent']['xmax'] < extent['xmax']:
+                mapping[facility]['extent']['xmax'] = extent['xmax']
 
-        if mapping[facility]['extent']['xmin'] > extent['xmin']:
-            mapping[facility]['extent']['xmin'] = extent['xmin']
+            if mapping[facility]['extent']['xmin'] > extent['xmin']:
+                mapping[facility]['extent']['xmin'] = extent['xmin']
+        else:
+            print('{} has no extent'.format(description.name))
 
         sys.stdout.write('.')
         sys.stdout.flush()
@@ -190,7 +200,7 @@ if __name__ == '__main__':
         merge_geodatabases(args['<input>'], args['<output>'])
 
     if args['create-map']:
-        create_facility_map(args['<input>'], args['<output>'])
+        create_facility_map(args['<input>'], args['<output>'], args['--recalculate'])
 
     if args['list-folders']:
         folders = get_fgdbs_in_folder(args['<input>'])
