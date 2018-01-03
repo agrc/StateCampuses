@@ -159,7 +159,8 @@ define([
                                            `<hr class='identify__hr' style="border-color:${item.color};"` +
                                            '<label>Attributes</label>';
                         item.attributes.forEach((attribute) => {
-                            templateBuilder += `<div>${attribute.label}: ${attribute.value}</div>`;
+                            templateBuilder += `<div>${attribute.label.replace('_Value', '')}:` +
+                                               ` ${attribute.value}</div>`;
                         });
                     });
 
