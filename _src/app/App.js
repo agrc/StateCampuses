@@ -9,7 +9,6 @@ define([
 
     'dojo/dom-construct',
     'dojo/text!./templates/App.html',
-    'dojo/topic',
     'dojo/request',
     'dojo/_base/declare',
 
@@ -17,13 +16,12 @@ define([
     'esri/geometry/Extent',
     'esri/tasks/IdentifyTask',
     'esri/tasks/IdentifyParameters',
-    'esri/tasks/IdentifyResult',
-
     'esri/layers/DynamicLayerInfo',
     'esri/layers/TableDataSource',
     'esri/layers/LayerDataSource',
     'esri/layers/LayerDrawingOptions',
     'esri/renderers/SimpleRenderer',
+    'esri/renderers/jsonUtils',
     'esri/symbols/SimpleFillSymbol',
     'esri/symbols/SimpleLineSymbol',
     'esri/symbols/SimpleMarkerSymbol',
@@ -43,7 +41,6 @@ define([
 
     domConstruct,
     template,
-    topic,
     request,
     declare,
 
@@ -51,13 +48,12 @@ define([
     Extent,
     IdentifyTask,
     IdentifyParameters,
-    IdentifyResult,
-
     DynamicLayerInfo,
     TableDataSource,
     LayerDataSource,
     LayerDrawingOptions,
     SimpleRenderer,
+    RendererFactory,
     SimpleFillSymbol,
     SimpleLineSymbol,
     SimpleMarkerSymbol,
@@ -235,6 +231,7 @@ define([
             groupInfo.layers.sort(comparison).forEach((item, index) => {
                 const [joinedName, type] = item;
                 const [name, displayName] = joinedName.split(':');
+
                 const dynamicLayerInfo = new DynamicLayerInfo();
                 dynamicLayerInfo.id = index;
                 dynamicLayerInfo.name = displayName || name;
@@ -248,21 +245,29 @@ define([
                 layerSource.dataSource = dataSource;
                 dynamicLayerInfo.source = layerSource;
 
-                const fractionOfSpectrum = (index + 1) / totalKeys;
-                const color = Color.fromRgb(window.d3.interpolateSpectral(fractionOfSpectrum));
+                const rendererJson = config.layerMapping[facility].layers[index][2];
+                let renderer = null;
 
-                let symbol = new SimpleMarkerSymbol(config.symbols.point);
+                if (rendererJson) {
+                    renderer = RendererFactory.fromJson(rendererJson.renderer);
+                } else {
+                    const fractionOfSpectrum = (index + 1) / totalKeys;
+                    const color = Color.fromRgb(window.d3.interpolateSpectral(fractionOfSpectrum));
 
-                if (type === 'Polyline') {
-                    symbol = new SimpleLineSymbol(config.symbols.line);
-                } else if (type === 'Polygon') {
-                    symbol = new SimpleFillSymbol(config.symbols.poly);
+                    let symbol = new SimpleMarkerSymbol(config.symbols.point);
+
+                    if (type === 'Polyline') {
+                        symbol = new SimpleLineSymbol(config.symbols.line);
+                    } else if (type === 'Polygon') {
+                        symbol = new SimpleFillSymbol(config.symbols.poly);
+                    }
+
+                    symbol = symbol.setColor(color);
+                    renderer = new SimpleRenderer(symbol);
                 }
 
-                symbol = symbol.setColor(color);
-
                 const drawingOptions = new LayerDrawingOptions();
-                drawingOptions.renderer = new SimpleRenderer(symbol);
+                drawingOptions.renderer = renderer;
 
                 this.currentLayerDrawingOptions[index] = drawingOptions;
                 this.currentLayers.push(dynamicLayerInfo);

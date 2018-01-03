@@ -6,7 +6,8 @@ state-campus
 Usage:
   state_campus merge-from <input> to <output>
   state_campus list-folders <input>
-  state_campus create-map <input> to <output> [--recalculate|-r]
+  state_campus create-map <input> to <output> with <mxd> [--recalculate|-r]
+  state_campus extract-symbology <input>
   state_campus -h | --help
 
 Options:
@@ -78,9 +79,14 @@ def merge_geodatabases(input_folder, output_folder):
         print('\n{}'.format(format_time(clock() - start_etl)))
 
 
-def create_facility_map(input_gdb, output_file, recalculate=False):
+def create_facility_map(input_gdb, output_file, mxd_path, recalculate=False):
     if not isdir(input_gdb) or not exists(input_gdb):
         raise Exception('{} is not a valid file geodatabase. exiting'.format(input_gdb))
+
+    if not exists(mxd_path):
+        raise Exception('{} is not a valid mxd. exiting'.format(mxd_path))
+
+    renderer_map = extract_symbology_from(mxd_path)
 
     arcpy.env.workspace = input_gdb
     layers = arcpy.ListFeatureClasses()
@@ -99,9 +105,13 @@ def create_facility_map(input_gdb, output_file, recalculate=False):
         facility, name = description.name.split('_', 1)
         extent = json.loads(description.extent.JSON)
 
+        renderer = None
+        if name.lower() in renderer_map:
+            renderer = renderer_map[name.lower()]
+
         mapping.setdefault(facility, {})
         mapping[facility].setdefault('layers', [])
-        mapping[facility]['layers'].append(['{}:{}'.format(name, description.aliasName), description.shapeType])
+        mapping[facility]['layers'].append(['{}:{}'.format(name, description.aliasName), description.shapeType, renderer])
         mapping[facility].setdefault('extent', extent)
 
         if extent['ymax'] != 'NaN':
@@ -124,6 +134,18 @@ def create_facility_map(input_gdb, output_file, recalculate=False):
 
     with open(output_file, 'w') as f:
         f.write(json.dumps(mapping))
+
+
+def extract_symbology_from(mxd_path):
+    mxd = arcpy.mapping.MapDocument(mxd_path)
+    data_frame = arcpy.mapping.ListDataFrames(mxd)[0]
+    layers = arcpy.mapping.ListLayers(data_frame)
+
+    layer_renderer_map = {}
+    for layer in layers:
+        layer_renderer_map[layer.datasetName.lower()] = json.loads(layer._arc_object.getsymbology())
+
+    return layer_renderer_map
 
 
 def get_fgdbs_in_folder(folder):
@@ -200,11 +222,16 @@ if __name__ == '__main__':
         merge_geodatabases(args['<input>'], args['<output>'])
 
     if args['create-map']:
-        create_facility_map(args['<input>'], args['<output>'], args['--recalculate'])
+        create_facility_map(args['<input>'], args['<output>'], args['<mxd>'], args['--recalculate'])
 
     if args['list-folders']:
         folders = get_fgdbs_in_folder(args['<input>'])
 
         print([basename(folder) for folder in folders])
+
+    if args['extract-symbology']:
+        symbology = extract_symbology_from(args['<input>'])
+
+        print(json.dumps(symbology, sort_keys=True, indent=2))
 
     print('\n{}'.format(format_time(clock() - start_seconds)))
