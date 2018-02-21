@@ -4,13 +4,13 @@ define([
     'esri/layers/ArcGISDynamicMapServiceLayer',
     'esri/layers/ArcGISTiledMapServiceLayer',
     'esri/layers/FeatureLayer'
-], function (
+], (
     lang,
 
     ArcGISDynamicMapServiceLayer,
     ArcGISTiledMapServiceLayer,
     FeatureLayer
-) {
+) => {
     return {
         // description:
         //      A mixin to create layers and turn them on and off
