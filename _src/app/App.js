@@ -221,6 +221,8 @@ define([
             //
             console.info('app/App:updateFacility', arguments);
 
+            this.toolbarNode.classList.remove('hide');
+
             const facility = evt.target.value;
             const groupInfo = config.layerMapping[facility];
             const layerNameKeys = Object.keys(groupInfo.layers);
