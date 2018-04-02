@@ -268,11 +268,6 @@
         }
       ],
       [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
-        null
-      ],
-      [
         "wMain:Water Mains",
         "Polyline",
         {
@@ -2112,11 +2107,6 @@
         }
       ],
       [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
-        null
-      ],
-      [
         "Tunnel_Poly:Tunnel Polygon",
         "Polygon",
         {
@@ -3706,11 +3696,6 @@
         null
       ],
       [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
-        null
-      ],
-      [
         "wNetworkStructure:Water Network Structures",
         "Point",
         null
@@ -4468,11 +4453,6 @@
         null
       ],
       [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
-        null
-      ],
-      [
         "Tunnel_Poly:Tunnel Polygon",
         "Polygon",
         {
@@ -5082,11 +5062,6 @@
       ],
       [
         "Tunnel_Line:Tunnel Line",
-        "Polyline",
-        null
-      ],
-      [
-        "Tunnel_Centerline:Tunnel Centerline",
         "Polyline",
         null
       ],
@@ -8596,11 +8571,6 @@
       [
         "swManhole:Storm Manholes",
         "Point",
-        null
-      ],
-      [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
         null
       ],
       [
@@ -12577,11 +12547,6 @@
         null
       ],
       [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
-        null
-      ],
-      [
         "wHydrant:Water Hydrants",
         "Point",
         {
@@ -13087,11 +13052,6 @@
           },
           "transparency": 0
         }
-      ],
-      [
-        "Tunnel_Centerline:Tunnel Centerline",
-        "Polyline",
-        null
       ],
       [
         "wHydrant:Water Hydrants",
