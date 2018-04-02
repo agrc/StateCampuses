@@ -129,9 +129,14 @@ define([
 
                 this.identifyTask.execute(this.identifyOptions).then((identifyResults) => {
                     const templateData = identifyResults.map((result) => {
+                        let color = 'black';
+                        if (this.currentLayerDrawingOptions[result.layerId].renderer.symbol) {
+                            color = this.currentLayerDrawingOptions[result.layerId].renderer.symbol.color.toHex();
+                        }
+
                         return {
                             name: this.currentLayers.filter((layer) => layer.id === result.layerId)[0].name,
-                            color: this.currentLayerDrawingOptions[result.layerId].renderer.symbol.color.toHex(),
+                            color: color,
                             geometry: result.feature.geometry,
                             attributes: Object.keys(result.feature.attributes).filter((key) => {
                                 if (result.feature.attributes[key].toLowerCase() === 'null' ||
