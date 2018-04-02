@@ -122,8 +122,10 @@ define([
             console.info('app/App::setupConnections', arguments);
 
             mapController.map.on('click', (evt) => {
+                console.log('identify click');
+
                 this.identifyOptions.mapExtent = mapController.map.extent;
-                this.identifyOptions.layerIds = mapController.activeLayer.visibleLayers;
+                this.identifyOptions.layerIds = mapController.activeLayer[0].visibleLayers;
                 this.identifyOptions.geometry = evt.mapPoint;
                 this.identifyOptions.dynamicLayerInfos = this.currentLayers;
 
