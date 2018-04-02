@@ -36,7 +36,19 @@ define([
 
             this.setupConnections();
 
-            this.dynamicLayers.forEach((layer) => {
+            this.dynamicLayers.sort((x, y) => {
+                const a = x.name.toUpperCase();
+                const b = y.name.toUpperCase();
+
+                if (a < b) {
+                    return -1;
+                }
+                if (a > b) {
+                    return 1;
+                }
+
+                return 0;
+            }).forEach((layer) => {
                 const checkbox = `<label class="layer-list-label">
                                     <input class="layer-list-layer" type="checkbox" checked value="${layer.id}">
                                   ${layer.name}</label>`;
