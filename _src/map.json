@@ -6778,7 +6778,7 @@
         }
       ],
       [
-        "Gas Pipe",
+        "P_Pipes:Gas Pipe",
         "Polyline",
         {
           "renderer": {
