@@ -144,7 +144,7 @@ define([
         },
         facilities: ['DHSDC', 'DHSSH', 'Dixie State', 'Fairpark', 'Gunnison Prison', 'Ogden ATC', 'SLCC Jordan',
             'SLCC Meadowbrook', 'SLCC Miller', 'SLCC Redwood', 'SLCC South City', 'Snow College Ephraim',
-            'Southern Utah', 'USU Eastern', 'USU Eastern Blanding', 'USU Logan', 'Utah State Captiol',
+            'Southern Utah', 'USU Eastern', 'USU Eastern Blanding', 'USU Logan', 'Utah State Capitol',
             'Utah Valley', 'Weber State', 'Weber State Davis']
     };
 
