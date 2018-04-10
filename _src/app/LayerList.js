@@ -77,6 +77,27 @@ define([
             layer.defaultVisibility = visibile;
 
             this.mapController.activeLayer[0].setDynamicLayerInfos(this.dynamicLayers, false);
+        },
+        toggle() {
+            // summary:
+            //      turn off or on all of the layers
+            console.info('app/LayerList:toggle', arguments);
+
+            let visible = false;
+            if (this.all.checked === 'on' || this.all.checked === true) {
+                visible = true;
+            }
+
+            const ui = this.placement.querySelectorAll('.layer-list-layer');
+            for (var i = 0; i < ui.length; i++) {
+                ui[i].checked = visible;
+            }
+
+            this.dynamicLayers.forEach((dynamicLayer) => {
+                dynamicLayer.defaultVisibility = visible;
+            });
+
+            this.mapController.activeLayer[0].setDynamicLayerInfos(this.dynamicLayers, false);
         }
     });
 });
