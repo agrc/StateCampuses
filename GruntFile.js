@@ -203,6 +203,11 @@ module.exports = function configure(grunt) {
                 }
             }
         },
+        'json-minify': {
+            main: {
+                files: 'dist/*.json'
+            }
+        },
         parallel: {
             options: {
                 grunt: true
@@ -349,6 +354,7 @@ module.exports = function configure(grunt) {
         'dojo:stage',
         'uglify:stage',
         'copy:packages',
+        'json-minify',
         'processhtml:main'
     ]);
     grunt.registerTask('deploy-stage', [
