@@ -21,3 +21,9 @@ This array can be copy pasted to the `config.js` `facilities` property.
 To create the mapping that is necessary to drive the drop down list, the extent zooming and layers related to each facility, run the following command,
 
 `python state-campus.py create-map <the-merged-gdb-location> to <project-_src-map.json>`
+
+### Publishing
+
+Add workspace
+
+![image](https://user-images.githubusercontent.com/325813/39160598-5d008ca2-4729-11e8-8480-6dcc5894cd61.png)
